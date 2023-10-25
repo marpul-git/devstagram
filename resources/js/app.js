@@ -11,23 +11,27 @@ if(document.getElementById("dropzone")) {
     maxFiles: 1,
     uploadMultiple: false,
   
-    init: function(){
-      if(  document.querySelector('[name="imagen"]').value.trim())
-      {
-        const imgPublicada = {}
-        imgPublicada.size=1234;
-        imgPublicada.name = document.querySelector('[name="imagen"]').value
-  
-        this.options.addedfile.call($this, imgPublicada);
-        this.options.thumbnail.call($this, `/uploads/${imgPublicada.name}`);
-  
-        imgPublicada.previewElement.classList.add(
-          "dz-success",
-          "dz-complete"
-        )
+    init: function() {
+      const dropzoneInstance = this;
+      const imagenInput = document.querySelector('[name="imagen"]');
+    
+      if (imagenInput.value.trim()) {
+        const imgPublicada = {
+          size: 1234,
+          name: imagenInput.value.trim()
+        };
+    
+        this.emit("addedfile", imgPublicada);
+        this.emit("thumbnail", imgPublicada, `/uploads/${imgPublicada.name}`);
+        this.emit("complete", imgPublicada);
+    
+        // Manejar el caso en que se elimine el archivo
+        imgPublicada.previewElement.querySelector(".dz-remove").addEventListener("click", function() {
+          dropzoneInstance.removeFile(imgPublicada);
+          imagenInput.value = "";
+        });
       }
     }
-  
   })
   
   dropzone.on('sending',function (file, xhr, formData){
